@@ -30,7 +30,7 @@ class Moondream:
                 "prompt": ("STRING", {"multiline": False, "default": "Please provide a detailed description of this image."},),
                 "device": (s.DEVICES, {"default": s.DEVICES[1]},),
                 "trust_remote_code": ("BOOLEAN", {"default": True},),
-                "isSaveMenery": ("BOOLEAN", {"default": True},),
+                "cache": ("BOOLEAN", {"default": True},),
             }
         }
 
@@ -40,7 +40,7 @@ class Moondream:
     OUTPUT_NODE = False
     CATEGORY = "CXH"
 
-    def gen(self, image:torch.Tensor, prompt:str,  device:str, trust_remote_code:bool,isSaveMenery:bool):
+    def gen(self, image:torch.Tensor, prompt:str,  device:str, trust_remote_code:bool,cache:bool):
         dev = "cuda" if device.lower() == "gpu" else "cpu"
         if (self.model == None) or (self.tokenizer == None)  or (device != self.device):
             del self.model
@@ -68,7 +68,8 @@ class Moondream:
             answer = self.model.answer_question(enc_image, prompt, self.tokenizer)
             descriptions += answer
 
-        if isSaveMenery == False:
+        #释放缓存
+        if cache == False:
             del self.model
             del self.tokenizer
             self.model = None
